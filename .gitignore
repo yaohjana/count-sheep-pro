@@ -1,0 +1,13 @@
+node_modules/
+output/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / 編輯器暫存檔
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
