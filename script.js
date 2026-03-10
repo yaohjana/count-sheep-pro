@@ -446,7 +446,23 @@ class SheepCounter {
     this.startBtn.disabled = true;
     this.pauseBtn.disabled = false;
 
+    // iOS Safari：語音必須在「使用者手勢」內觸發第一次 speak() 才會有聲音；同時在互動當下重新載入語音列表（getVoices 常在此時才可用）。
+    if (this.useVoice && this.synth) {
+      this.loadVoices();
+      this.unlockSpeechInUserGesture();
+    }
+
     this.scheduleLoop();
+  }
+
+  unlockSpeechInUserGesture() {
+    if (!this.synth) return;
+    const u = new SpeechSynthesisUtterance(" ");
+    u.volume = 0.01;
+    u.rate = 1;
+    try {
+      this.synth.speak(u);
+    } catch (_) {}
   }
 
   pause() {
