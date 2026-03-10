@@ -614,6 +614,18 @@ class SheepCounter {
     }
 
     return new Promise((resolve) => {
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timeoutId);
+        resolve(this.isRunning && token === this.cycleToken);
+      };
+
+      // 手機瀏覽器（尤其 iOS）語音常不觸發 onend，導致 Promise 永不 resolve、計數卡住。逾時後強制繼續。
+      const timeoutMs = 2500;
+      const timeoutId = window.setTimeout(finish, timeoutMs);
+
       if (this.synth.speaking) {
         this.synth.cancel();
       }
@@ -628,8 +640,8 @@ class SheepCounter {
       utterance.rate = 0.82;
       utterance.pitch = 0.95;
       utterance.volume = volume;
-      utterance.onend = () => resolve(this.isRunning && token === this.cycleToken);
-      utterance.onerror = () => resolve(this.isRunning && token === this.cycleToken);
+      utterance.onend = finish;
+      utterance.onerror = finish;
 
       this.synth.speak(utterance);
     });
